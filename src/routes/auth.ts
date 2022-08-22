@@ -8,8 +8,6 @@ const authController = new AuthController()
 router.post('/signup', authController.signup)
 router.post('/signin', authController.signin)
 
-router.post('/me',(req, res)=>{
-    res.status(200).json({msg:"Este sou eu?"})
-})
+router.post('/me', authController.me)
 
 export default router

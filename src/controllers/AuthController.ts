@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { MongoClient } from 'mongodb';
+import { meudb } from "../data/mongo/mymongodb";
 
 interface User {
     id?: string
@@ -9,15 +9,12 @@ interface User {
 }
 
 export class AuthController{
-    private client: MongoClient
-    private db
+    
     private users
 
     constructor(){
-        const uri = 'mongodb://localhost:17017'
-        this.client = new MongoClient(uri)
-        this.db = this.client.db('testeblog')
-        this.users = this.db.collection<User>('user')
+        
+        this.users = meudb.collection<User>('users')
     }
 
     public signup = async (req: Request, res: Response) =>{
@@ -50,5 +47,19 @@ export class AuthController{
         }
 
         return res.json(foundUser)
+    }
+    
+    public me =async (req:Request, res:Response) => {
+        const {email} = req.body
+        
+        const foundUser = await this.users.findOne<User>({
+            email
+        })
+
+        if(!foundUser){
+            return res.status(401).json({error: 'Usuário não cadastrado.'})
+        }
+
+        return res.json(`Usuário cadastrado pelo e-mail: ${foundUser.email}`)
     }
 }
